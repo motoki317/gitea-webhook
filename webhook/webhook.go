@@ -114,7 +114,7 @@ func handleIssueCommentEvent(c echo.Context) error {
 	}
 
 	message += fmt.Sprintf(" by `%s`\n", senderName)
-	message += fmt.Sprintf("Issue or Pull Request: %s\n", issueName)
+	message += fmt.Sprintf("%s\n", issueName)
 	message += fmt.Sprintf("\n---\n")
 	message += fmt.Sprintf("%s", payload.Comment.Body)
 
