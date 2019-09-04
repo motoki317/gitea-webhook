@@ -1,0 +1,35 @@
+Webhook
+
+Issues -> X-Gitea-Event: issues
+ EventName -> "action"
+ Create -> opened
+ Edited -> edited
+ Add Assign -> assigned
+ Remove Assign -> unassigned
+ Add/Remove Label -> label_updated
+ Add Milestone -> milestoned
+ Remove Milestone -> demilestoned
+ Close -> closed
+ Reopen -> reopened
+
+Issue Comments -> X-Gitea-Event: issue_comment
+ Comment Add -> created
+ Comment Edit -> edited
+ Comment Remove -> deleted
+
+Pull Requests -> X-Gitea-Event: pull_request
+ Create -> opened
+ Add commit -> synchronized
+ Request Review -> ?
+ Review -> ?
+ Review Comment Add -> ?
+ Comment add -> X-Gitea-Event: issue_comment, created
+ Approve -> ? (Cannot check rn)
+ Disapprove -> ?
+ Add Assign -> assigned
+ Remove Assign -> unassigned
+ Add Milestone -> milestoned
+ Remove Milestone -> demilestoned
+ Add/Remove Label -> label_updated
+ Close | Merge -> closed ("merged": true | false)
+ Reopen -> reopened 

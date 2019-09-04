@@ -8,7 +8,12 @@ import (
 	"github.com/motoki317/gitea-webhook/model"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
+)
+
+var (
+	UrlRegex = regexp.MustCompile("(.*)/api/v1/repos(.*)")
 )
 
 // postMessage Webhookにメッセージを投稿します
@@ -95,4 +100,11 @@ func getLabelNames(payload interface{}) (ret string) {
 		}
 	}
 	return ret
+}
+
+func fixURL(url string) string {
+	if match := UrlRegex.FindStringSubmatch(url); len(match) != 0 {
+		return match[1] + match[2]
+	}
+	return url
 }

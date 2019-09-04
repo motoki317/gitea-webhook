@@ -42,7 +42,7 @@ func handleIssuesEvent(c echo.Context) error {
 	log.Printf("Issue event action: %s\n", payload.Action)
 
 	senderName := payload.Sender.Username
-	message := fmt.Sprintf("### Issue [#%v %s](%s) ", payload.Issue.Number, payload.Issue.Title, payload.Issue.URL)
+	message := fmt.Sprintf("### Issue [#%v %s](%s) ", payload.Issue.Number, payload.Issue.Title, fixURL(payload.Issue.URL))
 
 	switch payload.Action {
 	case "opened":
@@ -86,7 +86,7 @@ func handleIssueCommentEvent(c echo.Context) error {
 	}
 
 	senderName := payload.Sender.Username
-	issueName := fmt.Sprintf("[#%v %s](%s)", payload.Issue.Number, payload.Issue.Title, payload.Issue.URL)
+	issueName := fmt.Sprintf("[#%v %s](%s)", payload.Issue.Number, payload.Issue.Title, fixURL(payload.Issue.URL))
 	message := "### "
 
 	switch payload.Action {
@@ -114,7 +114,7 @@ func handlePullRequestEvent(c echo.Context) error {
 	}
 
 	senderName := payload.Sender.Username
-	message := fmt.Sprintf("### Pull Request [#%v %s](%s) ", payload.PullRequest.Number, payload.PullRequest.Title, payload.PullRequest.URL)
+	message := fmt.Sprintf("### Pull Request [#%v %s](%s) ", payload.PullRequest.Number, payload.PullRequest.Title, fixURL(payload.PullRequest.URL))
 
 	switch payload.Action {
 	case "opened":
