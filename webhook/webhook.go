@@ -42,7 +42,7 @@ func handleIssuesEvent(c echo.Context) error {
 	log.Printf("Issue event action: %s\n", payload.Action)
 
 	senderName := payload.Sender.Username
-	message := fmt.Sprintf("Issue [#%v %s](%s) ", payload.Issue.Number, payload.Issue.Title, payload.Issue.URL)
+	message := fmt.Sprintf("### Issue [#%v %s](%s) ", payload.Issue.Number, payload.Issue.Title, payload.Issue.URL)
 
 	switch payload.Action {
 	case "opened":
@@ -72,7 +72,7 @@ func handleIssuesEvent(c echo.Context) error {
 		message += fmt.Sprintf("Reopened by `%s`\n", senderName)
 	}
 
-	message += fmt.Sprintf("---\n")
+	message += fmt.Sprintf("\n---\n")
 	message += fmt.Sprintf("%s", payload.Issue.Body)
 
 	return postMessage(c, message)
@@ -87,20 +87,20 @@ func handleIssueCommentEvent(c echo.Context) error {
 
 	senderName := payload.Sender.Username
 	issueName := fmt.Sprintf("[#%v %s](%s)", payload.Issue.Number, payload.Issue.Title, payload.Issue.URL)
-	message := "Comment "
+	message := "### "
 
 	switch payload.Action {
 	case "created":
-		message += "Created"
+		message += "New Comment"
 	case "edited":
-		message += "Edited"
+		message += "Comment Edited"
 	case "deleted":
-		message += "Deleted"
+		message += "Comment Deleted"
 	}
 
 	message += fmt.Sprintf(" by `%s`\n", senderName)
-	message += fmt.Sprintf("Issue or Pull Request %s\n", issueName)
-	message += fmt.Sprintf("---\n")
+	message += fmt.Sprintf("Issue or Pull Request: %s\n", issueName)
+	message += fmt.Sprintf("\n---\n")
 	message += fmt.Sprintf("%s", payload.Comment.Body)
 
 	return postMessage(c, message)
@@ -114,7 +114,7 @@ func handlePullRequestEvent(c echo.Context) error {
 	}
 
 	senderName := payload.Sender.Username
-	message := fmt.Sprintf("Pull Request [#%v %s](%s) ", payload.PullRequest.Number, payload.PullRequest.Title, payload.PullRequest.URL)
+	message := fmt.Sprintf("### Pull Request [#%v %s](%s) ", payload.PullRequest.Number, payload.PullRequest.Title, payload.PullRequest.URL)
 
 	switch payload.Action {
 	case "opened":
@@ -149,7 +149,7 @@ func handlePullRequestEvent(c echo.Context) error {
 		message += fmt.Sprintf("Reopened by `%s`\n", senderName)
 	}
 
-	message += fmt.Sprintf("---\n")
+	message += fmt.Sprintf("\n---\n")
 	message += fmt.Sprintf("%s", payload.PullRequest.Body)
 
 	return postMessage(c, message)
