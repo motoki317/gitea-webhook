@@ -27,6 +27,12 @@ func MakeWebhookHandler() func(c echo.Context) error {
 			return handleIssueCommentEvent(c)
 		case "pull_request":
 			return handlePullRequestEvent(c)
+		case "pull_request_approved":
+			return handlePullRequestReviewEvent(c, "approved")
+		case "pull_request_comment":
+			return handlePullRequestReviewEvent(c, "comment")
+		case "pull_request_rejected":
+			return handlePullRequestReviewEvent(c, "rejected")
 		}
 
 		return c.NoContent(http.StatusNoContent)
@@ -123,43 +129,68 @@ func handlePullRequestEvent(c echo.Context) error {
 	}
 
 	senderName := payload.Sender.Username
-	message := fmt.Sprintf("### Pull Request [#%v %s](%s) ", payload.PullRequest.Number, payload.PullRequest.Title, payload.PullRequest.HTMLURL)
+	message := "### "
+	prName := fmt.Sprintf("Pull Request [#%v %s](%s)", payload.PullRequest.Number, payload.PullRequest.Title, payload.PullRequest.HTMLURL)
 
 	switch payload.Action {
 	case "opened":
-		message += fmt.Sprintf("Opened by `%s`\n", senderName)
+		message += fmt.Sprintf("%s Opened by `%s`\n", prName, senderName)
+	case "edited":
+		message += fmt.Sprintf("%s Edited by `%s`\n", prName, senderName)
 	case "synchronized":
-		message += fmt.Sprintf("Changed by `%s`\n", senderName)
+		message += fmt.Sprintf("New Commit(s) to %s by `%s`\n", prName, senderName)
 	case "assigned":
-		message += fmt.Sprintf("Assigned to `%s`\n", payload.PullRequest.Assignee.Username)
+		message += fmt.Sprintf("%s Assigned to `%s`\n", prName, payload.PullRequest.Assignee.Username)
 		message += fmt.Sprintf("By `%s`\n", senderName)
 		message += fmt.Sprintf("Assignees: %s\n", getAssigneeNames(payload))
 	case "unassigned":
-		message += fmt.Sprintf("Unassigned\n")
+		message += fmt.Sprintf("%s Unassigned\n", prName)
 		message += fmt.Sprintf("By `%s`\n", senderName)
 		message += fmt.Sprintf("Assignees: %s\n", getAssigneeNames(payload))
 	case "milestoned":
-		message += fmt.Sprintf("Milestone Set by `%s`\n", senderName)
+		message += fmt.Sprintf("%s Milestone Set by `%s`\n", prName, senderName)
 		message += fmt.Sprintf("Milestone `%s` due to %s\n", payload.PullRequest.Milestone.Title, payload.PullRequest.Milestone.DueOn)
 	case "demilestoned":
-		message += fmt.Sprintf("Milestone Removed by `%s`\n", senderName)
+		message += fmt.Sprintf("%s Milestone Removed by `%s`\n", prName, senderName)
 	case "label_updated":
-		message += fmt.Sprintf("Label Updated\n")
+		message += fmt.Sprintf("%s Label Updated\n", prName)
 		message += fmt.Sprintf("By `%s`\n", senderName)
 		message += fmt.Sprintf("Labels: %s\n", getLabelNames(payload))
 	case "closed":
 		switch payload.PullRequest.Merged {
 		case true:
-			message += fmt.Sprintf("Merged by `%s`\n", senderName)
+			message += fmt.Sprintf("%s Merged by `%s`\n", prName, senderName)
 		case false:
-			message += fmt.Sprintf("Closed by `%s`\n", senderName)
+			message += fmt.Sprintf("%s Closed by `%s`\n", prName, senderName)
 		}
 	case "reopened":
-		message += fmt.Sprintf("Reopened by `%s`\n", senderName)
+		message += fmt.Sprintf("%s Reopened by `%s`\n", prName, senderName)
 	}
 
 	message += fmt.Sprintf("\n---\n")
 	message += fmt.Sprintf("%s", payload.PullRequest.Body)
+
+	return postMessage(c, message)
+}
+
+func handlePullRequestReviewEvent(c echo.Context, status string) error {
+	payload := model.PullRequestEvent{}
+	if err := c.Bind(&payload); err != nil {
+		log.Printf("Error occured while binding payload: %s\n", err)
+		return err
+	}
+
+	senderName := payload.Sender.Username
+	message := "### "
+	prName := fmt.Sprintf("Pull Request [#%v %s](%s)", payload.PullRequest.Number, payload.PullRequest.Title, payload.PullRequest.HTMLURL)
+	switch status {
+	case "approved":
+		message += fmt.Sprintf("%s Approved by `%s`", prName, senderName)
+	case "comment":
+		message += fmt.Sprintf("New Comment to %s", prName)
+	case "rejected":
+		message += fmt.Sprintf("%s Rejected by `%s`", prName, senderName)
+	}
 
 	return postMessage(c, message)
 }
