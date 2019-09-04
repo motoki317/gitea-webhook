@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 var (
@@ -42,7 +43,11 @@ func handleIssuesEvent(c echo.Context) error {
 	log.Printf("Issue event action: %s\n", payload.Action)
 
 	senderName := payload.Sender.Username
-	message := fmt.Sprintf("### Issue [#%v %s](%s) ", payload.Issue.Number, payload.Issue.Title, fixURL(payload.Issue.URL))
+	message := fmt.Sprintf("### Issue [#%v %s](%s) ",
+		payload.Issue.Number,
+		payload.Issue.Title,
+		payload.Repository.HTMLURL+"/issues/"+strconv.Itoa(payload.Issue.Number),
+	)
 
 	switch payload.Action {
 	case "opened":
@@ -86,7 +91,11 @@ func handleIssueCommentEvent(c echo.Context) error {
 	}
 
 	senderName := payload.Sender.Username
-	issueName := fmt.Sprintf("[#%v %s](%s)", payload.Issue.Number, payload.Issue.Title, fixURL(payload.Issue.URL))
+	issueName := fmt.Sprintf("[#%v %s](%s)",
+		payload.Issue.Number,
+		payload.Issue.Title,
+		payload.Repository.HTMLURL+"/issues/"+strconv.Itoa(payload.Issue.Number),
+	)
 	message := "### "
 
 	switch payload.Action {
@@ -114,7 +123,7 @@ func handlePullRequestEvent(c echo.Context) error {
 	}
 
 	senderName := payload.Sender.Username
-	message := fmt.Sprintf("### Pull Request [#%v %s](%s) ", payload.PullRequest.Number, payload.PullRequest.Title, fixURL(payload.PullRequest.URL))
+	message := fmt.Sprintf("### Pull Request [#%v %s](%s) ", payload.PullRequest.Number, payload.PullRequest.Title, payload.PullRequest.HTMLURL)
 
 	switch payload.Action {
 	case "opened":
