@@ -1,0 +1,6 @@
+type: runtime
+
+startup: make build
+entrypoint: ./main
+
+http_proxy: 8080
