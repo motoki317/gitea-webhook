@@ -74,7 +74,7 @@ func handleIssuesEvent(c echo.Context) error {
 		message += fmt.Sprintf("Labels: %s\n", getLabelNames(payload))
 	case "milestoned":
 		message += fmt.Sprintf("Milestone Set by `%s`\n", senderName)
-		message += fmt.Sprintf("Milestone `%s` due to %s\n", payload.Issue.Milestone.Title, payload.Issue.Milestone.DueOn)
+		message += fmt.Sprintf("Milestone `%s` due by %s\n", payload.Issue.Milestone.Title, payload.Issue.Milestone.DueOn)
 	case "demilestoned":
 		message += fmt.Sprintf("Milestone Removed by `%s`\n", senderName)
 	case "closed":
