@@ -49,38 +49,39 @@ func handleIssuesEvent(c echo.Context) error {
 	log.Printf("Issue event action: %s\n", payload.Action)
 
 	senderName := payload.Sender.Username
-	message := fmt.Sprintf("### Issue [#%v %s](%s) ",
+	issueName := fmt.Sprintf("Issue [#%v %s](%s) ",
 		payload.Issue.Number,
 		payload.Issue.Title,
 		payload.Repository.HTMLURL+"/issues/"+strconv.Itoa(payload.Issue.Number),
 	)
+	message := "### "
 
 	switch payload.Action {
 	case "opened":
-		message += fmt.Sprintf("Opened by `%s`\n", senderName)
+		message += fmt.Sprintf(":git_issue_opened: %s Opened by `%s`\n", issueName, senderName)
 	case "edited":
-		message += fmt.Sprintf("Edited by `%s`\n", senderName)
+		message += fmt.Sprintf(":pencil: %s Edited by `%s`\n", issueName, senderName)
 	case "assigned":
-		message += fmt.Sprintf("Assigned to `%s`\n", payload.Issue.Assignee.Username)
+		message += fmt.Sprintf(":bust_in_silhouette: %s Assigned to `%s`\n", issueName, payload.Issue.Assignee.Username)
 		message += fmt.Sprintf("By `%s`\n", senderName)
 		message += fmt.Sprintf("Assignees: %s\n", getAssigneeNames(payload))
 	case "unassigned":
-		message += fmt.Sprintf("Unassigned\n")
+		message += fmt.Sprintf(":bust_in_silhouette: %s Unassigned\n", issueName)
 		message += fmt.Sprintf("By `%s`\n", senderName)
 		message += fmt.Sprintf("Assignees: %s\n", getAssigneeNames(payload))
 	case "label_updated":
-		message += fmt.Sprintf("Label Updated\n")
+		message += fmt.Sprintf(":label: %s Label Updated\n", issueName)
 		message += fmt.Sprintf("By `%s`\n", senderName)
 		message += fmt.Sprintf("Labels: %s\n", getLabelNames(payload))
 	case "milestoned":
-		message += fmt.Sprintf("Milestone Set by `%s`\n", senderName)
+		message += fmt.Sprintf(":git_milestone: %s Milestone Set by `%s`\n", issueName, senderName)
 		message += fmt.Sprintf("Milestone `%s` due by %s\n", payload.Issue.Milestone.Title, payload.Issue.Milestone.DueOn)
 	case "demilestoned":
-		message += fmt.Sprintf("Milestone Removed by `%s`\n", senderName)
+		message += fmt.Sprintf(":git_milestone: %s Milestone Removed by `%s`\n", issueName, senderName)
 	case "closed":
-		message += fmt.Sprintf("Closed by `%s`\n", senderName)
+		message += fmt.Sprintf(":git_issue_closed: %s Closed by `%s`\n", issueName, senderName)
 	case "reopened":
-		message += fmt.Sprintf("Reopened by `%s`\n", senderName)
+		message += fmt.Sprintf(":git_issue_opened: %s Reopened by `%s`\n", issueName, senderName)
 	}
 
 	message += fmt.Sprintf("\n---\n")
@@ -106,11 +107,11 @@ func handleIssueCommentEvent(c echo.Context) error {
 
 	switch payload.Action {
 	case "created":
-		message += "New Comment"
+		message += ":comment: New Comment"
 	case "edited":
-		message += "Comment Edited"
+		message += ":pencil: Comment Edited"
 	case "deleted":
-		message += "Comment Deleted"
+		message += ":pencil: Comment Deleted"
 	}
 
 	message += fmt.Sprintf(" by `%s`\n", senderName)
@@ -134,37 +135,37 @@ func handlePullRequestEvent(c echo.Context) error {
 
 	switch payload.Action {
 	case "opened":
-		message += fmt.Sprintf("%s Opened by `%s`\n", prName, senderName)
+		message += fmt.Sprintf(":git_pull_request: %s Opened by `%s`\n", prName, senderName)
 	case "edited":
-		message += fmt.Sprintf("%s Edited by `%s`\n", prName, senderName)
+		message += fmt.Sprintf(":pencil: %s Edited by `%s`\n", prName, senderName)
 	case "synchronized":
-		message += fmt.Sprintf("New Commit(s) to %s by `%s`\n", prName, senderName)
+		message += fmt.Sprintf(":git_push_repo: New Commit(s) to %s by `%s`\n", prName, senderName)
 	case "assigned":
-		message += fmt.Sprintf("%s Assigned to `%s`\n", prName, payload.PullRequest.Assignee.Username)
+		message += fmt.Sprintf(":bust_in_silhouette: %s Assigned to `%s`\n", prName, payload.PullRequest.Assignee.Username)
 		message += fmt.Sprintf("By `%s`\n", senderName)
 		message += fmt.Sprintf("Assignees: %s\n", getAssigneeNames(payload))
 	case "unassigned":
-		message += fmt.Sprintf("%s Unassigned\n", prName)
+		message += fmt.Sprintf(":bust_in_silhouette: %s Unassigned\n", prName)
 		message += fmt.Sprintf("By `%s`\n", senderName)
 		message += fmt.Sprintf("Assignees: %s\n", getAssigneeNames(payload))
 	case "milestoned":
-		message += fmt.Sprintf("%s Milestone Set by `%s`\n", prName, senderName)
+		message += fmt.Sprintf(":git_milestone: %s Milestone Set by `%s`\n", prName, senderName)
 		message += fmt.Sprintf("Milestone `%s` due to %s\n", payload.PullRequest.Milestone.Title, payload.PullRequest.Milestone.DueOn)
 	case "demilestoned":
-		message += fmt.Sprintf("%s Milestone Removed by `%s`\n", prName, senderName)
+		message += fmt.Sprintf(":git_milestone: %s Milestone Removed by `%s`\n", prName, senderName)
 	case "label_updated":
-		message += fmt.Sprintf("%s Label Updated\n", prName)
+		message += fmt.Sprintf(":label: %s Label Updated\n", prName)
 		message += fmt.Sprintf("By `%s`\n", senderName)
 		message += fmt.Sprintf("Labels: %s\n", getLabelNames(payload))
 	case "closed":
 		switch payload.PullRequest.Merged {
 		case true:
-			message += fmt.Sprintf("%s Merged by `%s`\n", prName, senderName)
+			message += fmt.Sprintf(":git_merged: %s Merged by `%s`\n", prName, senderName)
 		case false:
-			message += fmt.Sprintf("%s Closed by `%s`\n", prName, senderName)
+			message += fmt.Sprintf(":git_pull_request_closed: %s Closed by `%s`\n", prName, senderName)
 		}
 	case "reopened":
-		message += fmt.Sprintf("%s Reopened by `%s`\n", prName, senderName)
+		message += fmt.Sprintf(":git_pull_request: %s Reopened by `%s`\n", prName, senderName)
 	}
 
 	message += fmt.Sprintf("\n---\n")
@@ -185,11 +186,11 @@ func handlePullRequestReviewEvent(c echo.Context, status string) error {
 	prName := fmt.Sprintf("Pull Request [#%v %s](%s)", payload.PullRequest.Number, payload.PullRequest.Title, payload.PullRequest.HTMLURL)
 	switch status {
 	case "approved":
-		message += fmt.Sprintf("%s Approved by `%s`", prName, senderName)
+		message += fmt.Sprintf(":white_check_mark: %s Approved by `%s`", prName, senderName)
 	case "comment":
-		message += fmt.Sprintf("New Review Comment to %s", prName)
+		message += fmt.Sprintf(":comment: %s New Review Comment by `%s`", prName)
 	case "rejected":
-		message += fmt.Sprintf("%s Rejected by `%s`", prName, senderName)
+		message += fmt.Sprintf(":comment: %s Changes Requested by `%s`", prName, senderName)
 	}
 
 	return postMessage(c, message)
