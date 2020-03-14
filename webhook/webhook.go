@@ -188,7 +188,7 @@ func handlePullRequestReviewEvent(c echo.Context, status string) error {
 	case "approved":
 		message += fmt.Sprintf(":white_check_mark: %s Approved by `%s`", prName, senderName)
 	case "comment":
-		message += fmt.Sprintf(":comment: %s New Review Comment by `%s`", prName)
+		message += fmt.Sprintf(":comment: %s New Review Comment by `%s`", prName, senderName)
 	case "rejected":
 		message += fmt.Sprintf(":comment: %s Changes Requested by `%s`", prName, senderName)
 	}
