@@ -192,6 +192,8 @@ func handlePullRequestReviewEvent(c echo.Context, status string) error {
 	case "rejected":
 		message += fmt.Sprintf(":comment: %s Changes Requested by `%s`", prName, senderName)
 	}
+	message += "\n---\n"
+	message += payload.Review.Content
 
 	return postMessage(c, message)
 }
