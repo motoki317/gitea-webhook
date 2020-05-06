@@ -13,12 +13,12 @@ import (
 
 // postMessage Webhookにメッセージを投稿します
 func postMessage(c echo.Context, message string) error {
-	url := "https://q.trap.jp/api/1.0/webhooks/" + TraqWebhookId
+	url := "https://q.trap.jp/api/v3/webhooks/" + TraqWebhookId
 	req, err := http.NewRequest("POST",
 		url,
 		strings.NewReader(message))
 	if err != nil {
-		log.Printf("Error occured while creating a new request: %s\n", err)
+		log.Printf("Error occurred while creating a new request: %s\n", err)
 		return err
 	}
 
@@ -35,7 +35,7 @@ func postMessage(c echo.Context, message string) error {
 	response := make([]byte, 512)
 	_, err = resp.Body.Read(response)
 	if err != nil {
-		log.Printf("Error occured while reading response from traq webhook: %s\n", err)
+		log.Printf("Error occurred while reading response from traq webhook: %s\n", err)
 	}
 
 	log.Printf("Message sent to %s, message: %s, response: %s\n", url, message, response)
